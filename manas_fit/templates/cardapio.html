@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cardápio — Manas Fit Marmitas</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/cardapio.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+<link rel="icon" type="image/jpeg" href="{{ url_for('static', filename='images/logo.jpeg') }}">
+</head>
+<body>
+
+<!-- AUTH MODAL -->
+<div class="auth-overlay" id="authOverlay" onclick="closeAuth()"></div>
+<div class="auth-modal" id="authModal">
+  <button class="auth-close" onclick="closeAuth()">✕</button>
+  <div id="viewLogin" class="auth-view">
+    <div class="auth-header">
+      <img src="{{ url_for('static', filename='images/logo.jpeg') }}" alt="Manas Fit" class="auth-logo">
+      <h2>Entrar</h2>
+      <p>Faça login para acessar o carrinho</p>
+    </div>
+    <div class="auth-error" id="loginError"></div>
+    <div class="auth-field">
+      <label>E-mail</label>
+      <input type="email" id="loginEmail" placeholder="seu@email.com">
+    </div>
+    <div class="auth-field">
+      <label>Senha</label>
+      <input type="password" id="loginPassword" placeholder="Sua senha">
+    </div>
+    <button class="auth-btn-primary" onclick="doLogin()">Entrar</button>
+    <div class="auth-divider"><span>ou</span></div>
+    <button class="auth-btn-google" onclick="googleLogin()">
+      <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      Entrar com Google
+    </button>
+    <p class="auth-switch">Não tem conta? <a href="#" onclick="showRegister()">Cadastre-se aqui</a></p>
+  </div>
+  <div id="viewRegister" class="auth-view" style="display:none;">
+    <div class="auth-header">
+      <img src="{{ url_for('static', filename='images/logo.jpeg') }}" alt="Manas Fit" class="auth-logo">
+      <h2>Criar Conta</h2>
+    </div>
+    <div class="auth-error" id="registerError"></div>
+    <div class="auth-field"><label>Nome completo *</label><input type="text" id="regName" placeholder="Seu nome"></div>
+    <div class="auth-field"><label>CPF *</label><input type="text" id="regCpf" placeholder="000.000.000-00" maxlength="14" oninput="maskCpf(this)"></div>
+    <div class="auth-field"><label>Celular *</label><input type="tel" id="regPhone" placeholder="(51) 9 9999-9999" maxlength="16" oninput="maskPhone(this)"></div>
+    <div class="auth-field"><label>CEP *</label><input type="text" id="regCep" placeholder="00000-000" maxlength="9" oninput="maskCep(this)"></div>
+    <div class="auth-field"><label>E-mail *</label><input type="email" id="regEmail" placeholder="seu@email.com"></div>
+    <div class="auth-field">
+      <label>Senha *</label>
+      <input type="password" id="regPassword" placeholder="Mín. 7 chars, maiúscula, minúscula e número">
+      <small class="field-hint">Mais de 6 dígitos, letras maiúsculas, minúsculas e números. Sem espaços ou acentos.</small>
+    </div>
+    <div class="auth-error" id="registerError2"></div>
+    <button class="auth-btn-primary" onclick="doRegister()">Criar Conta</button>
+    <p class="auth-switch">Já tem conta? <a href="#" onclick="showLogin()">Entrar aqui</a></p>
+  </div>
+  <div id="viewSuccess" class="auth-view" style="display:none;">
+    <div class="auth-success-box">
+      <div class="success-icon">✅</div>
+      <h3 id="successMsg">Login realizado!</h3>
+      <p id="successSub">Bem-vindo(a)!</p>
+      <button class="auth-btn-primary" onclick="closeAuth()">Continuar</button>
+    </div>
+  </div>
+</div>
+
+<nav>
+  <a href="/" class="nav-logo">
+    <img src="{{ url_for('static', filename='images/logo.jpeg') }}" alt="Manas Fit">
+    <span>Manas Fit</span>
+  </a>
+  <div class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="/">Início</a></li>
+    <li><a href="/cardapio">Cardápio</a></li>
+    <li><a href="/#contato">Contato</a></li>
+    <li>
+      {% if user %}
+        <button class="nav-user-btn" onclick="doLogout()">👤 {{ user.name.split()[0] }} · Sair</button>
+      {% else %}
+        <button class="nav-entrar-btn" onclick="openAuth()">Entrar</button>
+      {% endif %}
+    </li>
+  </ul>
+</nav>
+
+<!-- CART FAB -->
+<button class="cart-fab" onclick="openCart()">
+  🛒 <span>Carrinho</span>
+  <span class="cart-badge" id="cartBadge">0</span>
+</button>
+
+<!-- CART OVERLAY -->
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+
+<!-- CART SIDEBAR -->
+<div class="cart-sidebar" id="cartSidebar">
+  <div class="cart-header">
+    <h3>🛒 Meu Pedido</h3>
+    <button class="cart-close" onclick="closeCart()">✕ Fechar</button>
+  </div>
+
+  <!-- Blocked (not logged in) -->
+  <div class="cart-view" id="viewBlocked" style="display:none;">
+    <div class="cart-blocked-msg">
+      <div class="lock-icon">🔒</div>
+      <h4>Login necessário</h4>
+      <p>Faça login ou crie sua conta para acessar o carrinho e fazer pedidos.</p>
+      <button onclick="closeCart(); openAuth();">Entrar / Cadastrar</button>
+    </div>
+  </div>
+
+  <div class="cart-view" id="viewItems">
+    <div class="cart-items" id="cartItems">
+      <div class="cart-empty"><span class="emoji">🍽️</span><p>Seu carrinho está vazio.<br>Adicione delícias do nosso cardápio!</p></div>
+    </div>
+    <div class="cart-footer">
+      <div class="cart-total"><span>Total do pedido:</span><strong id="cartTotal">R$ 0,00</strong></div>
+      <button class="btn-wa" onclick="goToCheckout()">➡️ Continuar pedido</button>
+      <button class="btn-clear" onclick="clearCart()">🗑️ Limpar carrinho</button>
+    </div>
+  </div>
+
+  <div class="cart-view" id="viewMethod" style="display:none;">
+    <div class="checkout-body">
+      <button class="back-link" onclick="backToCart()">← Voltar ao carrinho</button>
+      <h4 class="checkout-title">Como você quer receber?</h4>
+      <button class="method-card" onclick="chooseMethod('retirada')">
+        <span class="method-icon">🏬</span>
+        <div><strong>Retirada no local</strong><p>Você retira diretamente em nosso endereço.</p></div>
+      </button>
+      <button class="method-card" onclick="chooseMethod('entrega')">
+        <span class="method-icon">🛵</span>
+        <div><strong>Entrega</strong><p>O pedido é levado até você.</p><p class="method-note">⚠️ Entrega via <strong>Uber-moto</strong>, valor da corrida pago pelo cliente.</p></div>
+      </button>
+    </div>
+  </div>
+
+  <div class="cart-view" id="viewForm" style="display:none;">
+    <div class="checkout-body">
+      <button class="back-link" onclick="goToCheckout()">← Trocar forma de envio</button>
+      <h4 class="checkout-title" id="formTitle">Dados para retirada</h4>
+      <div id="ubermotoNote" class="ubermoto-note" style="display:none;">🛵 A entrega é feita por <strong>Uber-moto</strong> — o valor da corrida é pago pelo cliente ao motoboy.</div>
+      <form id="orderForm" onsubmit="submitOrder(event)">
+        <label class="field"><span>Nome completo *</span><input type="text" id="fName" required placeholder="Seu nome"></label>
+        <label class="field" id="addrField" style="display:none;"><span>Endereço completo *</span><textarea id="fAddress" rows="3" placeholder="Rua, número, bairro, cidade"></textarea></label>
+        <label class="field"><span>Número de celular *</span><input type="tel" id="fPhone" required placeholder="(51) 9 9999-9999"></label>
+        <button type="submit" class="btn-wa">➡️ Continuar para pagamento</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="cart-view" id="viewPayment" style="display:none;">
+    <div class="checkout-body">
+      <button class="back-link" onclick="backToForm()">← Voltar aos dados</button>
+      <h4 class="checkout-title">Forma de pagamento</h4>
+      <div class="payment-options">
+        <button type="button" class="pay-btn" id="payPixBtn" onclick="choosePayment('pix')"><span class="pay-icon">💠</span><strong>PIX</strong></button>
+        <button type="button" class="pay-btn" id="payCashBtn" onclick="choosePayment('dinheiro')"><span class="pay-icon">💵</span><strong>Dinheiro</strong></button>
+      </div>
+      <div class="warn-box">⚠️ <strong>Atenção:</strong> sem confirmação de pagamento, o pedido <strong>não é realizado</strong>.</div>
+      <div id="pixBox" class="pay-detail" style="display:none;">
+        <h5>💠 Pagamento via PIX</h5>
+        <div class="pix-key"><span class="pix-label">Chave PIX (Celular)</span><div class="pix-row"><code id="pixKey">51984475041</code><button type="button" class="copy-btn" onclick="copyPix()">Copiar</button></div></div>
+        <div class="pix-upload">
+          <span class="pix-label">Anexe o comprovante *</span>
+          <label class="file-input-label" id="pixFileLabel">
+            <input type="file" id="pixProof" accept="image/*,application/pdf" onchange="onPixProofChange(this)" hidden>
+            <span id="pixFileText">📎 Escolher arquivo</span>
+          </label>
+        </div>
+      </div>
+      <div id="cashBox" class="pay-detail" style="display:none;">
+        <h5>💵 Pagamento em Dinheiro</h5>
+        <p>Você vai precisar de troco?</p>
+        <div class="toggle-row">
+          <button type="button" class="toggle-btn active" id="changeNoBtn" onclick="setNeedsChange(false)">Não preciso</button>
+          <button type="button" class="toggle-btn" id="changeYesBtn" onclick="setNeedsChange(true)">Sim, preciso</button>
+        </div>
+        <label class="field" id="cashAmountField" style="display:none;"><span>Quanto vai pagar? (R$)</span><input type="number" id="cashAmount" min="0" step="0.01" oninput="updateChange()"></label>
+        <p id="changeInfo" class="change-info" style="display:none;"></p>
+      </div>
+      <button type="button" class="btn-wa" onclick="confirmPayment()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.464 3.488"/></svg>
+        Confirmar e enviar pelo WhatsApp
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- PAGE HERO -->
+<div class="page-hero">
+  <div class="ph-inner">
+    <p class="section-label">Nossas Delícias</p>
+    <h1>Cardápio <span>Manas Fit</span></h1>
+    <p>Comida caseira com sabor, carinho e qualidade 🌿</p>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs-wrapper">
+  <div class="tabs">
+    <button class="tab active" onclick="showTab(event,'monte')">⚙️ Monte sua Marmita</button>
+    <button class="tab" onclick="showTab(event,'pizzas')">🍕 Mini Pizzas</button>
+    <button class="tab" onclick="showTab(event,'rissoles')">🥟 Rissoles</button>
+    <button class="tab" onclick="showTab(event,'massas')">🍝 Massas</button>
+  </div>
+</div>
+
+<!-- ═══ MONTE SUA MARMITA ═══════════════════════════════════════════════════ -->
+<div id="tab-monte" class="menu-section active" style="padding-bottom:80px;">
+  <div class="section-head">
+    <p class="section-label">Personalização</p>
+    <h2 class="section-title">Monte sua <span>Marmita</span></h2>
+    <div style="width:60px;height:3px;background:linear-gradient(90deg,#2E7D32,#81C784);border-radius:2px;margin-bottom:18px;"></div>
+    <p class="section-desc">Escolha cada ingrediente do jeitinho que você prefere. Você também escolhe o <strong>tamanho</strong>: 450g ou 750g!</p>
+  </div>
+
+  <div class="marmita-builder">
+    <div class="builder-steps">
+
+      <!-- PROTEÍNA -->
+      <div class="builder-step">
+        <h3><span class="step-badge">1</span> Proteína <span class="required-tag">Obrigatório</span></h3>
+        <div class="ingredients-grid">
+          <button class="ingredient-btn" data-group="proteina" data-name="Carne Bovina" onclick="selectSingle(this,'proteina')">🥩 Carne Bovina</button>
+          <button class="ingredient-btn" data-group="proteina" data-name="Carne Moída" onclick="selectSingle(this,'proteina')">🥩 Carne Moída</button>
+          <button class="ingredient-btn" data-group="proteina" data-name="Fígado Acebolado" onclick="selectSingle(this,'proteina')">🥩 Fígado Acebolado</button>
+          <button class="ingredient-btn" data-group="proteina" data-name="Frango Grelhado" onclick="selectSingle(this,'proteina')">🍗 Frango Grelhado</button>
+          <button class="ingredient-btn" data-group="proteina" data-name="Frango Desfiado" onclick="selectSingle(this,'proteina')">🍗 Frango Desfiado</button>
+        </div>
+      </div>
+
+      <!-- CARBOIDRATO -->
+      <div class="builder-step">
+        <h3><span class="step-badge">2</span> Carboidrato <span class="required-tag">Obrigatório</span></h3>
+        <div class="ingredients-grid">
+          <button class="ingredient-btn" data-group="carbo" data-name="Arroz Integral" onclick="selectSingle(this,'carbo')">🌾 Arroz Integral</button>
+          <button class="ingredient-btn" data-group="carbo" data-name="Arroz Branco" onclick="selectSingle(this,'carbo')">🍚 Arroz Branco</button>
+          <button class="ingredient-btn" data-group="carbo" data-name="Batata Inglesa" onclick="selectSingle(this,'carbo')">🥔 Batata Inglesa</button>
+          <button class="ingredient-btn" data-group="carbo" data-name="Mandioca" onclick="selectSingle(this,'carbo')">🌿 Mandioca</button>
+          <button class="ingredient-btn" data-group="carbo" data-name="Macarrão" onclick="selectSingle(this,'carbo')">🍝 Macarrão</button>
+          <button class="ingredient-btn" data-group="carbo" data-name="Macarrão Integral" onclick="selectSingle(this,'carbo')">🍝 Macarrão Integral</button>
+        </div>
+      </div>
+
+      <!-- EXTRA NUTRITIVO -->
+      <div class="builder-step">
+        <h3><span class="step-badge">3</span> Extra Nutritivo <span class="optional-tag">Opcional</span></h3>
+        <div class="ingredients-grid">
+          <button class="ingredient-btn" data-group="extra" data-name="Feijão" onclick="selectSingle(this,'extra')">🫘 Feijão</button>
+          <button class="ingredient-btn" data-group="extra" data-name="Lentilha" onclick="selectSingle(this,'extra')">🫘 Lentilha</button>
+        </div>
+      </div>
+
+      <!-- ACOMPANHAMENTOS -->
+      <div class="builder-step">
+        <h3><span class="step-badge">4</span> Acompanhamentos <span class="required-tag">Escolha até 2</span></h3>
+        <div class="ingredients-grid">
+          <button class="ingredient-btn" data-group="acomp" data-name="Abobrinha" onclick="selectMulti(this,'acomp',2)">🥒 Abobrinha</button>
+          <button class="ingredient-btn" data-group="acomp" data-name="Brócolis" onclick="selectMulti(this,'acomp',2)">🥦 Brócolis</button>
+          <button class="ingredient-btn" data-group="acomp" data-name="Beringela" onclick="selectMulti(this,'acomp',2)">🍆 Beringela</button>
+          <button class="ingredient-btn" data-group="acomp" data-name="Cenoura" onclick="selectMulti(this,'acomp',2)">🥕 Cenoura</button>
+          <button class="ingredient-btn" data-group="acomp" data-name="Couve" onclick="selectMulti(this,'acomp',2)">🥬 Couve</button>
+          <button class="ingredient-btn" data-group="acomp" data-name="Ervilha" onclick="selectMulti(this,'acomp',2)">🫛 Ervilha</button>
+          <button class="ingredient-btn" data-group="acomp" data-name="Milho" onclick="selectMulti(this,'acomp',2)">🌽 Milho</button>
+          <button class="ingredient-btn" data-group="acomp" data-name="Moranga" onclick="selectMulti(this,'acomp',2)">🎃 Moranga</button>
+          <button class="ingredient-btn" data-group="acomp" data-name="Repolho" onclick="selectMulti(this,'acomp',2)">🥬 Repolho</button>
+          <button class="ingredient-btn" data-group="acomp" data-name="Vagem" onclick="selectMulti(this,'acomp',2)">🫘 Vagem</button>
+        </div>
+      </div>
+
+      <!-- TAMANHO MARMITA -->
+      <div class="builder-step">
+        <h3><span class="step-badge">5</span> Tamanho <span class="required-tag">Obrigatório</span></h3>
+        <div class="size-grid" id="marmitaSizeGrid">
+          <button class="size-btn" data-size="450g" onclick="selectMarmitaSize(this,'450g')">
+            <span class="size-label">450g</span>
+            <span class="size-price">Individual</span>
+          </button>
+          <button class="size-btn" data-size="750g" onclick="selectMarmitaSize(this,'750g')">
+            <span class="size-label">750g</span>
+            <span class="size-price">Família</span>
+          </button>
+        </div>
+
+        <!-- COMBOS 450g -->
+        <div id="combos450" class="combo-box" style="display:none;">
+          <h4>📦 Combos Marmita 450g</h4>
+          <div class="combo-grid">
+            <div class="combo-card" onclick="selectCombo('marmita','450g',1,22)">
+              <div class="combo-qty">1 un.</div>
+              <div class="combo-price">R$ 22,00</div>
+              <div class="combo-each">R$ 22,00 cada</div>
+            </div>
+            <div class="combo-card destaque" onclick="selectCombo('marmita','450g',5,80)">
+              <div class="combo-badge">⭐ Popular</div>
+              <div class="combo-qty">5 un.</div>
+              <div class="combo-price">R$ 80,00</div>
+              <div class="combo-each">R$ 16,00 cada</div>
+            </div>
+            <div class="combo-card" onclick="selectCombo('marmita','450g',10,150)">
+              <div class="combo-qty">10 un.</div>
+              <div class="combo-price">R$ 150,00</div>
+              <div class="combo-each">R$ 15,00 cada</div>
+            </div>
+            <div class="combo-card" onclick="selectCombo('marmita','450g',20,290)">
+              <div class="combo-qty">20 un.</div>
+              <div class="combo-price">R$ 290,00</div>
+              <div class="combo-each">R$ 14,50 cada</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- COMBOS 750g -->
+        <div id="combos750" class="combo-box" style="display:none;">
+          <h4>📦 Combos Marmita 750g</h4>
+          <div class="combo-grid">
+            <div class="combo-card" onclick="selectCombo('marmita','750g',1,28)">
+              <div class="combo-qty">1 un.</div>
+              <div class="combo-price">R$ 28,00</div>
+              <div class="combo-each">R$ 28,00 cada</div>
+            </div>
+            <div class="combo-card destaque" onclick="selectCombo('marmita','750g',5,105)">
+              <div class="combo-badge">⭐ Popular</div>
+              <div class="combo-qty">5 un.</div>
+              <div class="combo-price">R$ 105,00</div>
+              <div class="combo-each">R$ 21,00 cada</div>
+            </div>
+            <div class="combo-card" onclick="selectCombo('marmita','750g',10,200)">
+              <div class="combo-qty">10 un.</div>
+              <div class="combo-price">R$ 200,00</div>
+              <div class="combo-each">R$ 20,00 cada</div>
+            </div>
+            <div class="combo-card" onclick="selectCombo('marmita','750g',20,390)">
+              <div class="combo-qty">20 un.</div>
+              <div class="combo-price">R$ 390,00</div>
+              <div class="combo-each">R$ 19,50 cada</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESUMO -->
+      <div class="builder-summary">
+        <h4>📋 Resumo da sua marmita:</h4>
+        <ul class="summary-list" id="builderSummary">
+          <li style="color:var(--muted); font-style:italic;">Nenhum ingrediente selecionado ainda...</li>
+        </ul>
+      </div>
+
+      <div class="error-msg" id="builderError"></div>
+
+      <div class="builder-footer">
+        <div class="builder-price" id="marmitaPrice">
+          R$ —
+          <span id="marmitaPriceLabel">Selecione um tamanho</span>
+        </div>
+        <div class="builder-actions">
+          <button class="btn-clear-marmita" type="button" onclick="clearMarmita()">🧹 Limpar</button>
+          <button class="btn-add-marmita" onclick="addMarmitaToCart()">➕ Adicionar ao Carrinho</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MINI PIZZAS ══════════════════════════════════════════════════════════ -->
+<div id="tab-pizzas" class="menu-section" style="padding-bottom:80px;">
+  <div class="section-head">
+    <p class="section-label">Artesanais</p>
+    <h2 class="section-title">Mini Pizzas <span>Deliciosas</span></h2>
+    <div style="width:60px;height:3px;background:linear-gradient(90deg,#2E7D32,#81C784);border-radius:2px;margin-bottom:18px;"></div>
+    <p class="section-desc">Cada bandeja com <strong>10 mini pizzas por apenas R$ 10,00</strong>! Massa artesanal, recheios caprichados.</p>
+  </div>
+  <div style="margin-bottom:24px;"><img src="{{ url_for('static', filename='images/pizza.jpg') }}" alt="Mini Pizzas" class="pizza-img"></div>
+  <div class="menu-grid">
+    <div class="menu-card"><div class="menu-card-header"><h3>🍗 Frango Tradicional</h3><span class="price">R$ 10,00</span></div><p>10 unidades de mini pizza com frango temperado e queijo.</p><button class="add-btn" onclick="addToCart('Mini Pizza Frango Tradicional (10un)', 10)">+ Adicionar</button></div>
+    <div class="menu-card"><div class="menu-card-header"><h3>🧀 Frango com Catupiry</h3><span class="price">R$ 10,00</span></div><p>10 unidades com frango e catupiry super cremoso.</p><button class="add-btn" onclick="addToCart('Mini Pizza Frango c/ Catupiry (10un)', 10)">+ Adicionar</button></div>
+    <div class="menu-card"><div class="menu-card-header"><h3>⭐ Frango Cremoso Especial</h3><span class="price">R$ 10,00</span></div><p>10 unidades com molho cremoso especial da casa.</p><button class="add-btn" onclick="addToCart('Mini Pizza Frango Cremoso Especial (10un)', 10)">+ Adicionar</button></div>
+    <div class="menu-card"><div class="menu-card-header"><h3>🥩 Estrogonofe de Carne</h3><span class="price">R$ 10,00</span></div><p>10 unidades com estrogonofe caseiro de carne.</p><button class="add-btn" onclick="addToCart('Mini Pizza Estrogonofe de Carne (10un)', 10)">+ Adicionar</button></div>
+    <div class="menu-card"><div class="menu-card-header"><h3>🌶️ Calabresa Suprema</h3><span class="price">R$ 10,00</span></div><p>10 unidades com calabresa e queijo.</p><button class="add-btn" onclick="addToCart('Mini Pizza Calabresa Suprema (10un)', 10)">+ Adicionar</button></div>
+    <div class="menu-card"><div class="menu-card-header"><h3>🥓 Bacon Crocante</h3><span class="price">R$ 10,00</span></div><p>10 unidades com bacon crocante e queijo.</p><button class="add-btn" onclick="addToCart('Mini Pizza Bacon Crocante (10un)', 10)">+ Adicionar</button></div>
+    <div class="menu-card"><div class="menu-card-header"><h3>🫒 Portuguesa Completa</h3><span class="price">R$ 10,00</span></div><p>10 unidades com ovos, presunto, cebola e queijo.</p><button class="add-btn" onclick="addToCart('Mini Pizza Portuguesa Completa (10un)', 10)">+ Adicionar</button></div>
+    <div class="menu-card"><div class="menu-card-header"><h3>🥦 Brócolis com Queijo</h3><span class="price">R$ 10,00</span></div><p>10 unidades com brócolis fresco e queijo gratinado.</p><button class="add-btn" onclick="addToCart('Mini Pizza Brócolis com Queijo (10un)', 10)">+ Adicionar</button></div>
+  </div>
+</div>
+
+<!-- ═══ RISSOLES ══════════════════════════════════════════════════════════════ -->
+<div id="tab-rissoles" class="menu-section" style="padding-bottom:80px;">
+  <div class="section-head">
+    <p class="section-label">Artesanais</p>
+    <h2 class="section-title">Rissoles de <span>Frango</span></h2>
+    <div style="width:60px;height:3px;background:linear-gradient(90deg,#2E7D32,#81C784);border-radius:2px;margin-bottom:18px;"></div>
+    <p class="section-desc">Tamanho grande, recheio generoso, empanado crocante e feitos com carinho artesanal.</p>
+  </div>
+  <div style="margin-bottom:28px;"><img src="{{ url_for('static', filename='images/rissoles.jpeg') }}" alt="Rissoles" class="pizza-img"></div>
+  <div class="menu-grid" style="max-width:600px;">
+    <div class="menu-card">
+      <div class="menu-card-header"><h3>🥟 Rissoles de Frango</h3><span class="price">R$ 24,00</span></div>
+      <p>6 unidades tamanho grande com recheio cremoso de frango. Empanados artesanalmente, prontos para fritar.</p>
+      <button class="add-btn" onclick="addToCart('Rissoles de Frango (6un grandes)', 24)">+ Adicionar</button>
+    </div>
+    <div class="menu-card">
+      <div class="menu-card-header"><h3>🥟 Rissoles de Carne</h3><span class="price">R$ 24,00</span></div>
+      <p>6 unidades tamanho grande com recheio suculento de carne. Empanados artesanalmente, prontos para fritar.</p>
+      <button class="add-btn" onclick="addToCart('Rissoles de Carne (6un grandes)', 24)">+ Adicionar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MASSAS ════════════════════════════════════════════════════════════════ -->
+<div id="tab-massas" class="menu-section" style="padding-bottom:80px;">
+  <div class="section-head">
+    <p class="section-label">Frescas & Artesanais</p>
+    <h2 class="section-title">Massas <span>Caseiras</span></h2>
+    <div style="width:60px;height:3px;background:linear-gradient(90deg,#2E7D32,#81C784);border-radius:2px;margin-bottom:18px;"></div>
+    <p class="section-desc">Massas frescas produzidas artesanalmente com farinha selecionada. Textura perfeita, sabor caseiro!</p>
+  </div>
+
+  <!-- MASSAS SECAS -->
+  <div class="massas-section-block">
+    <h3 class="massas-subheader">🍝 Massas Frescas — R$ 12,00 cada</h3>
+    <p class="massas-hint">Escolha o tipo da sua massa:</p>
+    <div style="margin-bottom:24px;">
+      <img src="{{ url_for('static', filename='images/massa.jpeg') }}" alt="Massas Caseiras" class="pizza-img">
+    </div>
+    <div class="menu-grid">
+      <div class="menu-card">
+        <div class="menu-card-header"><h3>🍝 Espaguete</h3><span class="price">R$ 12,00</span></div>
+        <p>Massa fresca espaguete artesanal, perfeita para molhos encorpados.</p>
+        <button class="add-btn" onclick="addToCart('Massa Fresca Espaguete', 12)">+ Adicionar</button>
+      </div>
+      <div class="menu-card">
+        <div class="menu-card-header"><h3>🍝 Espaguete Fino</h3><span class="price">R$ 12,00</span></div>
+        <p>Massa fresca espaguete fino, ideal para molhos mais delicados e leves.</p>
+        <button class="add-btn" onclick="addToCart('Massa Fresca Espaguete Fino', 12)">+ Adicionar</button>
+      </div>
+      <div class="menu-card">
+        <div class="menu-card-header"><h3>🍝 Ruscatelle</h3><span class="price">R$ 12,00</span></div>
+        <p>Massa fresca ruscatelle artesanal, com formato único que absorve bem os molhos.</p>
+        <button class="add-btn" onclick="addToCart('Massa Fresca Ruscatelle', 12)">+ Adicionar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MASSA AO MOLHO BRANCO -->
+  <div class="massas-section-block" style="margin-top:48px;">
+    <h3 class="massas-subheader">🥛 Massa ao Molho Branco</h3>
+    <div style="margin-bottom:24px;">
+      <img src="{{ url_for('static', filename='images/massaMolhoBranco.jpeg') }}" alt="Massa ao Molho Branco" class="pizza-img">
+    </div>
+
+    <div class="molho-branco-desc">
+      <h4>📋 Sobre o prato</h4>
+      <p><strong>Massa penne ao molho branco</strong>, com <strong>molho branco cremoso + mix de legumes</strong> (cenoura, ervilha, milho, pimentão vermelho e amarelo). Também disponível com <strong>frango ao molho branco cremoso</strong>, finalizado com <strong>crispy de bacon</strong>.</p>
+      <p style="margin-top:10px;">💡 <em>Você pode escolher <strong>2 sabores na mesma embalagem!</strong></em></p>
+    </div>
+
+    <!-- BUILDER MOLHO BRANCO -->
+    <div class="marmita-builder" style="margin-top:24px;">
+      <div class="builder-steps">
+
+        <!-- SABORES -->
+        <div class="builder-step">
+          <h3><span class="step-badge">1</span> Sabores <span class="required-tag">Escolha até 2 sabores na mesma embalagem</span></h3>
+          <div class="ingredients-grid">
+            <button class="ingredient-btn" data-group="mbsabor" data-name="Penne ao Molho Branco com Mix de Legumes" onclick="selectMulti(this,'mbsabor',2)">🥦 Molho Branco + Legumes</button>
+            <button class="ingredient-btn" data-group="mbsabor" data-name="Frango ao Molho Branco com Crispy de Bacon" onclick="selectMulti(this,'mbsabor',2)">🍗 Frango + Crispy de Bacon</button>
+          </div>
+        </div>
+
+        <!-- TAMANHO MASSA -->
+        <div class="builder-step">
+          <h3><span class="step-badge">2</span> Tamanho <span class="required-tag">Obrigatório</span></h3>
+          <div class="size-grid" id="massaSizeGrid">
+            <button class="size-btn" data-size="450g" onclick="selectMassaSize(this,'450g')">
+              <span class="size-label">450g</span>
+              <span class="size-price">R$ 16,00</span>
+            </button>
+            <button class="size-btn" data-size="750g" onclick="selectMassaSize(this,'750g')">
+              <span class="size-label">750g</span>
+              <span class="size-price">R$ 21,00</span>
+            </button>
+          </div>
+
+          <!-- COMBOS MOLHO BRANCO 450g -->
+          <div id="combosMB450" class="combo-box" style="display:none;">
+            <h4>📦 Combos Massa ao Molho Branco 450g</h4>
+            <div class="combo-grid">
+              <div class="combo-card" onclick="selectCombo('massa','450g',1,16)">
+                <div class="combo-qty">1 un.</div>
+                <div class="combo-price">R$ 16,00</div>
+                <div class="combo-each">R$ 16,00 cada</div>
+              </div>
+              <div class="combo-card destaque" onclick="selectCombo('massa','450g',5,80)">
+                <div class="combo-badge">⭐ Popular</div>
+                <div class="combo-qty">5 un.</div>
+                <div class="combo-price">R$ 80,00</div>
+                <div class="combo-each">R$ 16,00 cada</div>
+              </div>
+              <div class="combo-card" onclick="selectCombo('massa','450g',10,150)">
+                <div class="combo-qty">10 un.</div>
+                <div class="combo-price">R$ 150,00</div>
+                <div class="combo-each">R$ 15,00 cada</div>
+              </div>
+              <div class="combo-card" onclick="selectCombo('massa','450g',20,290)">
+                <div class="combo-qty">20 un.</div>
+                <div class="combo-price">R$ 290,00</div>
+                <div class="combo-each">R$ 14,50 cada</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- COMBOS MOLHO BRANCO 750g -->
+          <div id="combosMB750" class="combo-box" style="display:none;">
+            <h4>📦 Combos Massa ao Molho Branco 750g</h4>
+            <div class="combo-grid">
+              <div class="combo-card" onclick="selectCombo('massa','750g',1,21)">
+                <div class="combo-qty">1 un.</div>
+                <div class="combo-price">R$ 21,00</div>
+                <div class="combo-each">R$ 21,00 cada</div>
+              </div>
+              <div class="combo-card destaque" onclick="selectCombo('massa','750g',5,105)">
+                <div class="combo-badge">⭐ Popular</div>
+                <div class="combo-qty">5 un.</div>
+                <div class="combo-price">R$ 105,00</div>
+                <div class="combo-each">R$ 21,00 cada</div>
+              </div>
+              <div class="combo-card" onclick="selectCombo('massa','750g',10,200)">
+                <div class="combo-qty">10 un.</div>
+                <div class="combo-price">R$ 200,00</div>
+                <div class="combo-each">R$ 20,00 cada</div>
+              </div>
+              <div class="combo-card" onclick="selectCombo('massa','750g',20,390)">
+                <div class="combo-qty">20 un.</div>
+                <div class="combo-price">R$ 390,00</div>
+                <div class="combo-each">R$ 19,50 cada</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="builder-summary">
+          <h4>📋 Resumo da sua massa:</h4>
+          <ul class="summary-list" id="mbSummary">
+            <li style="color:var(--muted); font-style:italic;">Nenhuma opção selecionada ainda...</li>
+          </ul>
+        </div>
+
+        <div class="error-msg" id="mbError"></div>
+
+        <div class="builder-footer">
+          <div class="builder-price" id="mbPrice">
+            R$ —
+            <span id="mbPriceLabel">Selecione tamanho e combo</span>
+          </div>
+          <div class="builder-actions">
+            <button class="btn-clear-marmita" type="button" onclick="clearMassa()">🧹 Limpar</button>
+            <button class="btn-add-marmita" onclick="addMassaToCart()">➕ Adicionar ao Carrinho</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const IS_LOGGED = {{ 'true' if user else 'false' }};
+</script>
+<script src="{{ url_for('static', filename='js/cardapio.js') }}"></script>
+<script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+</body>
+</html>
