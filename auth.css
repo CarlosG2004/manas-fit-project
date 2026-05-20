@@ -1,0 +1,314 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   AUTH.CSS — Modal de autenticação + botões da Nav
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* ─── OVERLAY ───────────────────────────────────────────────────────────────── */
+.auth-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.72);
+  z-index: 200;
+  backdrop-filter: blur(4px);
+}
+.auth-overlay.open { display: block; }
+
+/* ─── MODAL ─────────────────────────────────────────────────────────────────── */
+.auth-modal {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.95);
+  z-index: 300;
+  background: #141414;
+  border: 1px solid rgba(76,175,80,0.3);
+  border-radius: 20px;
+  padding: 40px 36px;
+  width: 100%;
+  max-width: 440px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.7);
+  transition: transform 0.3s, opacity 0.3s;
+  opacity: 0;
+}
+.auth-modal.open {
+  display: block;
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+}
+
+/* ─── FECHAR ─────────────────────────────────────────────────────────────────── */
+.auth-close {
+  position: absolute;
+  top: 14px; right: 18px;
+  background: none; border: none;
+  color: #aaa; font-size: 1.1rem;
+  cursor: pointer;
+  transition: color 0.2s;
+  line-height: 1;
+}
+.auth-close:hover { color: #fff; }
+
+/* ─── HEADER ─────────────────────────────────────────────────────────────────── */
+.auth-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+.auth-logo {
+  width: 64px; height: 64px;
+  border-radius: 50%; object-fit: cover;
+  border: 2px solid #4CAF50;
+  margin-bottom: 12px;
+  display: block;
+  margin-left: auto; margin-right: auto;
+}
+.auth-header h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.7rem;
+  color: #fff;
+  margin-bottom: 4px;
+}
+.auth-header p { color: #aaa; font-size: 0.92rem; }
+
+/* ─── CAMPOS ─────────────────────────────────────────────────────────────────── */
+.auth-field { margin-bottom: 16px; }
+.auth-field label {
+  display: block;
+  color: #ccc;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.auth-field input {
+  width: 100%;
+  background: #1f1f1f;
+  border: 1px solid rgba(76,175,80,0.25);
+  border-radius: 10px;
+  padding: 12px 14px;
+  color: #e8e8e8;
+  font-size: 0.95rem;
+  font-family: 'Nunito', sans-serif;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+  box-sizing: border-box;
+}
+.auth-field input:focus {
+  border-color: #4CAF50;
+  box-shadow: 0 0 0 3px rgba(76,175,80,0.15);
+}
+.field-hint {
+  color: #888;
+  font-size: 0.78rem;
+  margin-top: 4px;
+  display: block;
+  line-height: 1.4;
+}
+
+/* ─── BOTÃO PRINCIPAL ───────────────────────────────────────────────────────── */
+.auth-btn-primary {
+  width: 100%;
+  background: linear-gradient(135deg, #2E7D32, #4CAF50);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  padding: 14px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-top: 8px;
+  box-shadow: 0 4px 16px rgba(76,175,80,0.3);
+  line-height: 1;
+  display: block;
+}
+.auth-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(76,175,80,0.4);
+}
+
+/* ─── DIVISOR ────────────────────────────────────────────────────────────────── */
+.auth-divider {
+  display: flex; align-items: center; gap: 12px;
+  margin: 16px 0;
+  color: #555; font-size: 0.85rem;
+}
+.auth-divider::before, .auth-divider::after {
+  content: ''; flex: 1; height: 1px; background: #333;
+}
+
+/* ─── BOTÃO GOOGLE ───────────────────────────────────────────────────────────── */
+.auth-btn-google {
+  width: 100%;
+  background: #fff;
+  color: #333;
+  border: none;
+  border-radius: 50px;
+  padding: 13px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  line-height: 1;
+}
+.auth-btn-google:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+/* ─── LINK TROCA ─────────────────────────────────────────────────────────────── */
+.auth-switch {
+  text-align: center;
+  color: #aaa;
+  font-size: 0.88rem;
+  margin-top: 18px;
+}
+.auth-switch a {
+  color: #81C784;
+  text-decoration: none;
+  font-weight: 700;
+}
+.auth-switch a:hover { text-decoration: underline; }
+
+/* ─── MENSAGEM DE ERRO ───────────────────────────────────────────────────────── */
+.auth-error {
+  background: rgba(220,50,50,0.14);
+  border: 1px solid rgba(220,50,50,0.4);
+  border-radius: 8px;
+  color: #ff8080;
+  font-size: 0.88rem;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  display: none;
+  line-height: 1.5;
+}
+.auth-error.show { display: block; }
+
+/* ─── TELA DE SUCESSO ────────────────────────────────────────────────────────── */
+.auth-success-box {
+  text-align: center;
+  padding: 20px 0;
+}
+.success-icon { font-size: 3rem; margin-bottom: 16px; }
+.auth-success-box h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  color: #81C784;
+  margin-bottom: 8px;
+}
+.auth-success-box p { color: #aaa; margin-bottom: 24px; }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   BOTÕES DA NAV — altura corrigida, alinhamento vertical perfeito
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* Garante que o <li> do botão fique alinhado com os links */
+.nav-links li:has(.nav-entrar-btn),
+.nav-links li:has(.nav-user-btn) {
+  display: flex;
+  align-items: center;
+}
+
+/* Botão "Entrar" */
+.nav-entrar-btn {
+  background: linear-gradient(135deg, #2E7D32, #4CAF50);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  /* ✅ Altura corrigida — usa height explícita para evitar variações */
+  height: 36px;
+  padding: 0 22px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 2px 12px rgba(76,175,80,0.3);
+  line-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+.nav-entrar-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(76,175,80,0.5);
+}
+
+/* Botão "Usuário logado" */
+.nav-user-btn {
+  background: rgba(76,175,80,0.12);
+  color: #81C784;
+  border: 1px solid rgba(76,175,80,0.35);
+  border-radius: 50px;
+  height: 36px;
+  padding: 0 18px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  line-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.nav-user-btn:hover {
+  background: rgba(220,50,50,0.14);
+  border-color: rgba(220,50,50,0.4);
+  color: #ff8080;
+}
+
+/* ─── CARRINHO BLOQUEADO ─────────────────────────────────────────────────────── */
+.cart-blocked-msg {
+  text-align: center;
+  padding: 40px 24px;
+}
+.cart-blocked-msg .lock-icon { font-size: 3rem; margin-bottom: 16px; }
+.cart-blocked-msg h4 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  color: #e8e8e8;
+  margin-bottom: 8px;
+}
+.cart-blocked-msg p { color: #aaa; font-size: 0.9rem; margin-bottom: 20px; }
+.cart-blocked-msg button {
+  background: linear-gradient(135deg, #2E7D32, #4CAF50);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  padding: 12px 28px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+/* ─── RESPONSIVO ─────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  /* No mobile, o botão fica dentro do menu vertical */
+  .nav-links li:has(.nav-entrar-btn),
+  .nav-links li:has(.nav-user-btn) {
+    justify-content: flex-start;
+  }
+  .nav-entrar-btn,
+  .nav-user-btn {
+    height: 40px;
+    line-height: 40px;
+    font-size: 1rem;
+    width: 100%;
+    max-width: none;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-modal { padding: 28px 18px; max-width: 96vw; border-radius: 16px; }
+}

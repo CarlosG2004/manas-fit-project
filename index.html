@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manas Fit Marmitas</title>
+<meta name="description" content="Manas Fit Marmitas — comida caseira, marmitas fit, mini pizzas, rissoles e massas em Cachoeirinha-RS.">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="index.css">
+<link rel="stylesheet" href="auth.css">
+<link rel="icon" type="image/jpeg" href="logo.jpeg">
+</head>
+<body>
+
+<!-- AUTH MODAL -->
+<div class="auth-overlay" id="authOverlay" onclick="closeAuth()"></div>
+<div class="auth-modal" id="authModal">
+  <button class="auth-close" onclick="closeAuth()">✕</button>
+
+  <!-- LOGIN VIEW -->
+  <div id="viewLogin" class="auth-view">
+    <div class="auth-header">
+      <img src="logo.jpeg" alt="Manas Fit" class="auth-logo">
+      <h2>Entrar</h2>
+      <p>Acesse sua conta para fazer pedidos</p>
+    </div>
+    <div class="auth-error" id="loginError"></div>
+    <div class="auth-field">
+      <label>E-mail</label>
+      <input type="email" id="loginEmail" placeholder="seu@email.com">
+    </div>
+    <div class="auth-field">
+      <label>Senha</label>
+      <input type="password" id="loginPassword" placeholder="Sua senha">
+    </div>
+    <button class="auth-btn-primary" onclick="doLogin()">Entrar</button>
+    <p class="auth-switch">Não tem conta? <a href="#" onclick="showRegister()">Cadastre-se aqui</a></p>
+  </div>
+
+  <!-- REGISTER VIEW -->
+  <div id="viewRegister" class="auth-view" style="display:none;">
+    <div class="auth-header">
+      <img src="logo.jpeg" alt="Manas Fit" class="auth-logo">
+      <h2>Criar Conta</h2>
+      <p>Preencha todos os campos para se cadastrar</p>
+    </div>
+    <div class="auth-error" id="registerError"></div>
+    <div class="auth-field"><label>Nome completo *</label><input type="text" id="regName" placeholder="Seu nome completo"></div>
+    <div class="auth-field"><label>CPF *</label><input type="text" id="regCpf" placeholder="000.000.000-00" maxlength="14" oninput="maskCpf(this)"></div>
+    <div class="auth-field"><label>Celular *</label><input type="tel" id="regPhone" placeholder="(51) 9 9999-9999" maxlength="16" oninput="maskPhone(this)"></div>
+    <div class="auth-field"><label>CEP *</label><input type="text" id="regCep" placeholder="00000-000" maxlength="9" oninput="maskCep(this)"></div>
+    <div class="auth-field"><label>E-mail *</label><input type="email" id="regEmail" placeholder="seu@email.com"></div>
+    <div class="auth-field">
+      <label>Senha *</label>
+      <input type="password" id="regPassword" placeholder="Mín. 7 chars, maiúscula, minúscula e número">
+      <small class="field-hint">Mais de 6 dígitos, letras maiúsculas, minúsculas e números. Sem espaços ou acentos.</small>
+    </div>
+    <div class="auth-error" id="registerError2"></div>
+    <button class="auth-btn-primary" onclick="doRegister()">Criar Conta</button>
+    <p class="auth-switch">Já tem conta? <a href="#" onclick="showLogin()">Entrar aqui</a></p>
+  </div>
+
+  <!-- SUCCESS VIEW -->
+  <div id="viewSuccess" class="auth-view" style="display:none;">
+    <div class="auth-success-box">
+      <div class="success-icon">✅</div>
+      <h3 id="successMsg">Login realizado!</h3>
+      <p id="successSub">Bem-vindo(a) de volta!</p>
+      <button class="auth-btn-primary" onclick="closeAuth()">Continuar</button>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">
+    <img src="logo.jpeg" alt="Manas Fit">
+    <span>Manas Fit</span>
+  </a>
+  <div class="hamburger" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </div>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html">Início</a></li>
+    <li><a href="cardapio.html">Cardápio</a></li>
+    <li><a href="#contato">Contato</a></li>
+    <li id="navAuthBtn">
+      <button class="nav-entrar-btn" onclick="openAuth()">Entrar</button>
+    </li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg" id="parallaxBg" style="background-image:url('marmitas.jpeg');"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <img src="logo.jpeg" alt="Manas Fit logo" class="hero-logo">
+    <h1><span class="white">Manas </span><span class="green">Fit</span><br><span class="white">Marmitas</span></h1>
+    <p class="hero-tagline">A melhor comida caseira da região 🌿</p>
+    <div class="hero-cta">
+      <a href="cardapio.html" class="btn-primary">Ver Cardápio</a>
+      <a href="#sobre" class="btn-outline">Saiba Mais</a>
+    </div>
+  </div>
+  <div class="scroll-indicator">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<!-- SOBRE -->
+<section class="about" id="sobre">
+  <div class="about-inner">
+    <div class="about-text reveal">
+      <p class="section-label">Nossa História</p>
+      <h2 class="section-title">Feito com <span style="color:var(--green-light)">amor e dedicação</span></h2>
+      <div class="section-divider"></div>
+      <p>Somos as <strong>Manas Fit</strong> — duas irmãs apaixonadas por comida caseira de qualidade! Nossa missão é levar até você refeições deliciosas, equilibradas e preparadas com ingredientes frescos e selecionados.</p>
+      <p>Oferecemos <strong>marmitas montadas do seu jeito</strong>, ideais para quem cuida da alimentação sem abrir mão do sabor. Também temos <strong>mini pizzas artesanais</strong>, <strong>rissoles crocantes</strong> e <strong>massas caseiras frescas</strong> — tudo preparado com o carinho de uma cozinha de verdade.</p>
+      <p>Nossa cozinha é localizada em <strong>Cachoeirinha-RS</strong>, e já conquistamos o coração de muitos clientes que buscam praticidade sem sacrificar a qualidade.</p>
+    </div>
+    <div class="about-img reveal">
+      <img src="marmitas.jpeg" alt="Marmitas Manas Fit">
+    </div>
+  </div>
+</section>
+
+<!-- DESTAQUES -->
+<section class="highlights" id="destaques">
+  <div class="highlights-inner">
+    <p class="section-label reveal">Nossos Produtos</p>
+    <h2 class="section-title reveal">O que temos <span style="color:var(--green-light)">para você</span></h2>
+    <div class="section-divider reveal"></div>
+    <div class="highlights-grid">
+      <div class="highlight-card reveal" onclick="window.location.href='cardapio.html'">
+        <img src="marmitas.jpeg" alt="Monte sua marmita">
+        <div class="highlight-card-body"><h3>🥡 Monte sua Marmita</h3><p>Escolha proteína, carboidrato e acompanhamentos do jeitinho que você quer. Marmita personalizada, fresca e cheia de sabor para a sua rotina!</p></div>
+      </div>
+      <div class="highlight-card reveal" onclick="window.location.href='cardapio.html'">
+        <img src="pizza.jpg" alt="Mini Pizzas">
+        <div class="highlight-card-body"><h3>🍕 Mini Pizzas Artesanais</h3><p>10 unidades por apenas R$10! Recheios variados como frango com catupiry, calabresa suprema, portuguesa e muito mais.</p></div>
+      </div>
+      <div class="highlight-card reveal" onclick="window.location.href='cardapio.html'">
+        <img src="rissoles.jpeg" alt="Rissoles de Frango">
+        <div class="highlight-card-body"><h3>🥟 Rissoles de Frango</h3><p>Tamanho grande, com recheio generoso e empanado crocante. 6 unidades por R$24. Feitos artesanalmente com qualidade caseira inconfundível.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LOCALIZAÇÃO -->
+<section class="location" id="localizacao">
+  <div class="location-inner">
+    <p class="section-label reveal">Onde Estamos</p>
+    <h2 class="section-title reveal"><span style="color:var(--green-light)">Localização</span></h2>
+    <div class="section-divider reveal" style="margin:0 auto 40px;"></div>
+    <div class="location-card reveal">
+      <span class="location-icon">📍</span>
+      <h3>A melhor comida caseira da região!</h3>
+      <div class="location-address">Rua Curitiba, 882 — Bairro Anair<br>Cachoeirinha — RS</div>
+      <p>Estamos em Cachoeirinha, prontas para entrega — você pode encomendar sua comida com a melhor gastronomia caseira. Faça seu pedido pelo WhatsApp!</p>
+    </div>
+  </div>
+</section>
+
+<!-- CONTATO -->
+<section class="contact" id="contato">
+  <div class="contact-inner">
+    <p class="section-label reveal">Fale Conosco!</p>
+    <h2 class="section-title reveal">Entre em <span style="color:var(--green-light)">Contato</span></h2>
+    <div class="section-divider reveal" style="margin:0 auto 20px;"></div>
+    <p class="reveal" style="color:var(--muted); margin-bottom:10px;">Faça seu pedido diretamente pelo WhatsApp com nossas atendentes:</p>
+    <div class="contact-cards">
+      <a href="https://wa.me/5551984475048" target="_blank" class="contact-card reveal">
+        <span class="wa-icon">💚</span>
+        <div class="contact-name">Ivanete</div>
+        <div class="contact-role">Co-fundadora & Cozinheira</div>
+        <span class="wa-btn">WhatsApp</span>
+      </a>
+      <a href="https://wa.me/5551985179851" target="_blank" class="contact-card reveal">
+        <span class="wa-icon">💚</span>
+        <div class="contact-name">Elisandra</div>
+        <div class="contact-role">Co-fundadora & Cozinheira</div>
+        <span class="wa-btn">WhatsApp</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>© 2025 <span>Manas Fit Marmitas</span> — Rua Curitiba, 882, Bairro Anair, Cachoeirinha-RS 🌿</p>
+  <p style="margin-top:8px;font-size:0.8rem;">A melhor comida caseira da região!</p>
+</footer>
+
+<script>var IS_LOGGED = false;</script>
+<script src="scripts.js"></script>
+<script src="auth.js"></script>
+</body>
+</html>
